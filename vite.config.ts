@@ -5,17 +5,12 @@ import react from '@vitejs/plugin-react';
 export default defineConfig(({ mode }) => {
     const env = loadEnv(mode, '.', '');
     return {
-      server: {
-        port: 3000,
-        host: '0.0.0.0',
-      },
+      // 这里的路径必须和你的仓库名完全一致
+      base: '/Merry-Christmas-my-sweetheart-/', 
       plugins: [react()],
-      define: {
-        'process.env.API_KEY': JSON.stringify(env.GEMINI_API_KEY),
-        'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY)
-      },
       resolve: {
         alias: {
+          // 核心修改：将 @ 别名指向当前根目录 (.)，而不是 src
           '@': path.resolve(__dirname, '.'),
         }
       }
