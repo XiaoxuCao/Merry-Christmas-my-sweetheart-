@@ -1,0 +1,45 @@
+name: Deploy React Site
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install and Build
+        run: |
+          # 1. 安装依赖：使用 --legacy-peer-deps 强行解决 React 18/19 冲突
+          npm install --legacy-peer-deps
+          
+          # 2. 环境清理：设置 CI=false，防止代码里的微小 Warning 导致打包中断
+          export CI=false
+          
+          # 3. 开始打包：因为文件就在根目录，Vite 会直接抓取 index.html 进行合成
+          npm run build
+          
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # Vite 默认的产物文件夹是 dist
+          path: './dist'
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
